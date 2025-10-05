@@ -64,7 +64,10 @@ export function getNthNoteInKey(root: number, n: number) {
     return notes[n];
 }
 
-export function noteToPositionInKey(root: number, note: number) {
+export function noteToPositionInKey(root: number, note: number, isSingleNoteMode: boolean = false) {
+    if (isSingleNoteMode) {
+        return null;
+    }
     let offset = (note - root) % 12;
     if (offset < 0) offset += 12;
     const positionInKey = majorKeyOffsets.indexOf(offset)

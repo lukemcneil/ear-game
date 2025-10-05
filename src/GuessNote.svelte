@@ -16,6 +16,7 @@
     } from "./chords";
 
     let notes;
+    let singleNoteMode = false;
 
     let minRootNote = 48;
     let maxRootRote = 72;
@@ -257,20 +258,21 @@
 
         let hold = 500;
         let pause = 100;
-        let chords = [
-            [0, Chord.Major, Inversion.Root],
-            [5 - 12, Chord.Major, Inversion.Second],
-            [7 - 12, Chord.Major, Inversion.First],
-            [0, Chord.Major, Inversion.Root],
-        ];
-        for (const [offset, chordType, inversion] of chords) {
-            chordOn(rootNote + offset, chordType, inversion);
+        if (!singleNoteMode) {
+            let chords = [
+                [0, Chord.Major, Inversion.Root],
+                [5 - 12, Chord.Major, Inversion.Second],
+                [7 - 12, Chord.Major, Inversion.First],
+                [0, Chord.Major, Inversion.Root],
+            ];
+            for (const [offset, chordType, inversion] of chords) {
+                chordOn(rootNote + offset, chordType, inversion);
+                await sleep(hold);
+                chordOff(rootNote + offset, chordType, inversion);
+                await sleep(pause);
+            }
             await sleep(hold);
-            chordOff(rootNote + offset, chordType, inversion);
-            await sleep(pause);
         }
-
-        await sleep(hold);
         if (newNoteToGuess) {
             pickedN = Math.floor(Math.random() * 8);
             positionInKey = pickedN + 1;
@@ -312,6 +314,11 @@
     <input type="checkbox" bind:checked={randomRoot} />
 </label>
 
+<label>
+    Single Note Mode
+    <input type="checkbox" bind:checked={singleNoteMode} />
+</label>
+
 {#key rootNote}
     <div class="keyboard">
         <div>
@@ -323,7 +330,7 @@
                     on:notereleased={({ detail }) => noteOff(detail)}
                     pressed={keysPressed.includes(note)}
                     bind:this={keyBindings[midiToKey(note)]}
-                    numberInKey={noteToPositionInKey(rootNote, note)}
+                    numberInKey={noteToPositionInKey(rootNote, note, singleNoteMode)}
                 />
             {/each}
         </div>
